@@ -1,0 +1,72 @@
+Car Fuel Efficiency (MPG) Predictor
+========================================================
+author: Sujal
+date: October 2026
+autosize: true
+transition: rotate
+font-family: 'Helvetica'
+
+<style>
+.reveal h1, .reveal h2, .reveal h3 { color: #1f6f8b; }
+.reveal pre code { font-size: 0.85em; }
+.reveal .slides section .slideContent { font-size: 0.9em; }
+</style>
+
+A Shiny app that predicts a car's mileage
+from its **weight**, **horsepower** and **transmission**.
+
+*Developing Data Products — Course Project*
+
+The Problem
+========================================================
+
+- Fuel cost is one of the biggest running costs of owning a car.
+- Before buying, people want a quick answer to:
+  **"How many miles per gallon will this car give?"**
+- Spec sheets list weight, horsepower and gearbox — but not always real-world mileage.
+
+**Our idea:** turn those three easy-to-find numbers into an instant mileage estimate,
+with no statistics knowledge needed.
+
+How It Works
+========================================================
+
+The app fits a linear regression on R's built-in `mtcars` dataset (32 cars):
+
+```{r}
+fit <- lm(mpg ~ wt + hp + am, data = mtcars)
+round(coef(fit), 3)
+```
+
+- Every 1000 lbs of extra weight costs about `r round(-coef(fit)["wt"], 1)` MPG.
+- The model explains `r round(summary(fit)$r.squared * 100)`% of the variation in MPG.
+
+A Live Example
+========================================================
+
+A 3000 lb, 120 hp car with a **manual** gearbox:
+
+```{r}
+car <- data.frame(wt = 3.0, hp = 120, am = 1)
+round(predict(fit, car, interval = "prediction"), 1)
+```
+
+```{r, echo=FALSE, fig.width=8, fig.height=3.2}
+par(mar = c(4, 4, 1, 1))
+plot(mtcars$wt, mtcars$mpg, pch = 16, col = "grey55",
+     xlab = "Weight (1000 lbs)", ylab = "MPG")
+points(3.0, predict(fit, car), pch = 18, col = "red", cex = 3)
+```
+
+Try It Yourself
+========================================================
+
+**Using the app takes three steps:**
+1. Move the **weight** and **horsepower** sliders.
+2. Choose **Automatic** or **Manual** transmission.
+3. Read the predicted MPG, km/l and 95% range — updated instantly, with a plot.
+
+A built-in **"How to use"** tab explains everything for first-time users.
+
+- **App:** https://sujalkumargupta.shinyapps.io/MPGPredictor/
+- **Code:** https://github.com/sujalkumargupta/MPGPredictor
